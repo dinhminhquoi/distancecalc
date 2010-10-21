@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/menu_exit" android:title="@string/exit"
+		android:icon="@drawable/exit">
+	</item>
+	<item android:id="@+id/menu_settings" android:icon="@drawable/settings" android:title="@string/distance_unit">
+	<menu><group android:enabled="true" android:checkableBehavior="single" android:visible="true" android:id="@+id/menu_unit_select"><item android:title="@string/km" android:id="@+id/km"></item>
+<item android:title="@string/miles" android:id="@+id/miles"></item>
+</group>
+
+</menu>
+
+</item>
+</menu>

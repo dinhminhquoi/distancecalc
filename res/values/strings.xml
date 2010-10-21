@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="miles">miles</string>
+    <string name="km">km</string>
+    
+    <string name="exit">Exit</string>
+    
+    <string name="app_name">Distance Calculator</string>
+<string name="start">Start Calculating</string>
+<string name="stop">Stop</string>
+<string name="dots">. . . .</string>
+<string name="service_not_available">Service Not Available</string>
+<string name="service_temp_not_available">Service Not Available At This Time</string>
+<string name="starting">Getting Your Location</string>
+<string name="empty"></string>
+<string name="notificationTitle">Distance Calculator</string>
+<string name="notificationMsg">Using GPS to calculate distance</string>
+<string name="distance_unit">Distance Unit</string>
+</resources>
