@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory>
+        <ListPreference
+	        android:title="@string/distance_unit"
+	        android:summary="@string/distance_unit_summ"
+	        android:key="distanceUnit"
+	        android:defaultValue="miles"
+	        android:entries="@array/distanceUnits"
+	        android:entryValues="@array/distanceUnitValues" />
+	</PreferenceCategory>
+    <PreferenceCategory>
+        <ListPreference
+            android:title="@string/action"
+            android:summary="@string/action_summ"
+            android:key="action"
+            android:defaultValue="biking"
+            android:entries="@array/actions"
+            android:entryValues="@array/actionValues" />
+    </PreferenceCategory>
+</PreferenceScreen>

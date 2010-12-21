@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:myapp="http://schemas.android.com/apk/res/com.gebogebo.android.distancecalc"
 	android:orientation="vertical" android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
 	
+    <com.admob.android.ads.AdView
+        android:id="@+id/ad"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        myapp:backgroundColor="#FFFFFF"
+        myapp:primaryTextColor="#000000"
+        myapp:secondaryTextColor="#CCCCCC" />
+		
     <TextView
         android:id="@+drawable/errors"
         android:layout_width="fill_parent"
@@ -16,11 +25,20 @@
         android:id="@+drawable/distance"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:paddingTop="50px"
-		android:paddingBottom="10px"
+		android:padding="15px"
 		android:gravity="center"
 		android:layout_weight="1"
-		android:textSize="40px"
+		android:textSize="28px"
+        android:text="@string/dots" />
+        
+    <TextView
+        android:id="@+drawable/currentSpeed"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="15px"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:textSize="18px"
         android:text="@string/dots" />
 
     <Button 
@@ -33,4 +51,5 @@
         android:gravity="center"
         android:textSize="20px"
     />
+    
 </LinearLayout>
