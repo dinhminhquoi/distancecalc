@@ -10,8 +10,8 @@
 <string name="start">Start Calculating</string>
 <string name="stop">Stop</string>
 <string name="dots">. . . .</string>
-<string name="service_not_available">Service Not Available</string>
-<string name="service_temp_not_available">Service Not Available At This Time</string>
+<string name="service_not_available">Unable to locate you using GPS</string>
+<string name="service_temp_not_available">Trying to find your location</string>
 
 <string name="empty"></string>
 <string name="notificationTitle">Distance Calculator</string>
@@ -27,7 +27,8 @@
 <string name="driving">Driving</string>
 
 <string name="action">Action</string>
-<string name="action_summ">Choose what you are doing for optimal battery performance</string><dimen name="errorTextSize">12px</dimen><string-array name="distanceUnitValues"><item>km</item>
+<string name="action_summ">Choose what you are doing for optimal battery performance</string>
+<dimen name="smallTextSize">16sp</dimen><string-array name="distanceUnitValues"><item>km</item>
 <item>miles</item>
 </string-array><string-array name="actions"><item>@string/walking</item>
 <item>@string/driving</item>
@@ -42,5 +43,12 @@
 </string-array>
 <string name="Hr">Hr</string>
 
-<string name="currSpeedFormat">Current speed:%.2f %s/%s</string>
+<string name="currSpeedFormat">Current speed: %.2f %s/%s</string>
+<string name="help">Help</string>
+<string name="capture">Capture</string>
+<string name="msg_no_storage">No external storage found to save screenshot</string>
+<string name="msg_file_saved">File saved at %s</string>
+<string name="current_action">Action: %s</string>
+<string name="msg_unable_to_save">Unable to save screenshot to storage</string>
+<dimen name="largeTextSize">25sp</dimen>
 </resources>
