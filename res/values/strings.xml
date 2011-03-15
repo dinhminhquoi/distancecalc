@@ -51,4 +51,7 @@
 <string name="current_action">Action: %s</string>
 <string name="msg_unable_to_save">Unable to save screenshot to storage</string>
 <dimen name="largeTextSize">25sp</dimen>
+<string name="timeElapsedFormat">Total time: %s</string>
+<string name="pause">Pause</string>
+<string name="resume">Resume</string>
 </resources>
