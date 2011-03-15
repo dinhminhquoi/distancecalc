@@ -40,8 +40,8 @@
                 <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
         </receiver>
-        <meta-data android:value="true" android:name="ADMOB_ALLOW_LOCATION_FOR_ADS"/>
 
+        <meta-data android:value="false" android:name="ADMOB_ALLOW_LOCATION_FOR_ADS"/>
 
     </application>
 
