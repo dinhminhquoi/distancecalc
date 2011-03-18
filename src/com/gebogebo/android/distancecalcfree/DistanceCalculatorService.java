@@ -21,7 +21,7 @@ import android.util.Log;
 
 public class DistanceCalculatorService extends Service implements LocationListener {
     private enum SERVICE_MODE {
-        started, stopped, paused, resumed
+        starting, started, stopped, paused, resuming, resumed
     };
 
     private final Set<DistanceCalculatorServiceListener> LISTENERS = new HashSet<DistanceCalculatorServiceListener>();
@@ -61,23 +61,14 @@ public class DistanceCalculatorService extends Service implements LocationListen
      * start this service
      */
     public void start() {
-        goForeground();
-        setServiceParameters(SERVICE_MODE.started);
-        startListeningToLocationEvents();
+        setServiceParameters(SERVICE_MODE.starting);
     }
 
     /**
      * stop this service
      */
     public void stop() {
-        if (SERVICE_MODE.paused.equals(currentServiceMode)) {
-            resume();
-        }
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationManager.removeUpdates(this);
-        stopForeground(true);
         setServiceParameters(SERVICE_MODE.stopped);
-        Log.i("service", "Stopped listening to location changes");
     }
 
     /**
@@ -85,11 +76,7 @@ public class DistanceCalculatorService extends Service implements LocationListen
      * total time spent by app
      */
     public void pause() {
-        if (SERVICE_MODE.paused.equals(currentServiceMode)) {
-            return; // already paused. nothing to do
-        }
-        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationManager.removeUpdates(this);
+
         setServiceParameters(SERVICE_MODE.paused);
     }
 
@@ -98,11 +85,7 @@ public class DistanceCalculatorService extends Service implements LocationListen
      * taken
      */
     public void resume() {
-        if (!SERVICE_MODE.paused.equals(currentServiceMode)) {
-            return; // nothing to do here as service is not in paused mode
-        }
-        startListeningToLocationEvents();
-        setServiceParameters(SERVICE_MODE.resumed);
+        setServiceParameters(SERVICE_MODE.resuming);
     }
 
     /**
@@ -125,36 +108,53 @@ public class DistanceCalculatorService extends Service implements LocationListen
 
     /**
      * sets service parameters as per current mode in which service is running
+     * usually takes care of modes which are changed based on user action
      * 
      * @param mode service mode in which service is currently running in
      */
     private void setServiceParameters(SERVICE_MODE mode) {
         switch (mode) {
-            case started:
+            case starting:
+                goForeground();
                 prevLocation = null;
                 actualDistanceCovered = -1.0F;
                 totalPausedTimeInMillis = 0l;
                 pausedStartTimeInMillis = 0l;
-                startTimeInSecs = System.currentTimeMillis() / 1000;
-                startTimeInSecs--; // decrement time so that 0 is never returned as time elapsed
                 SharedPreferences defPref = PreferenceManager.getDefaultSharedPreferences(this);
                 action = defPref.getString(DistanceCalculatorPrefActivity.PREF_KEY_ACTION,
                         DistanceCalculatorPrefActivity.PREF_BIKING);
+                startListeningToLocationEvents();
                 break;
             case paused:
+                if (SERVICE_MODE.paused.equals(currentServiceMode)) {
+                    return; // already paused. nothing to do
+                }
+                LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                locationManager.removeUpdates(this);
+                if(SERVICE_MODE.started.equals(currentServiceMode) || 
+                        SERVICE_MODE.resumed.equals(currentServiceMode)) {
+                    //only if he have started time, we care about pausedStartTime
+                    pausedStartTimeInMillis = System.currentTimeMillis();
+                }
                 prevLocation = null;
-                pausedStartTimeInMillis = System.currentTimeMillis();
-                break;
-            case resumed:
-                totalPausedTimeInMillis += System.currentTimeMillis() - pausedStartTimeInMillis;
-                pausedStartTimeInMillis = 0l;
                 break;
             case stopped:
+                locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                locationManager.removeUpdates(this);
+                stopForeground(true);
                 prevLocation = null;
                 actualDistanceCovered = -1.0F;
                 startTimeInSecs = -1L;
                 totalPausedTimeInMillis = 0l;
                 action = null;
+                break;
+            case resuming:
+                if (!SERVICE_MODE.paused.equals(currentServiceMode)) {
+                    return; // nothing to do here as service is not in paused mode
+                }
+                startListeningToLocationEvents();
+                break;
+            default:
                 break;
         }
         Log.i("service", "mode changed to " + mode);
@@ -213,30 +213,49 @@ public class DistanceCalculatorService extends Service implements LocationListen
         Log.i("service", "service brought to foreground");
     }
 
-    // location listener overrides
+    /**
+     * this method listen to location changes and also changes service modes. modes which are dependent on location change
+     * are usually taken care of by this method
+     * 
+     * @param newLocation new location which is returned by GPS
+     */
     @Override
     public void onLocationChanged(Location newLocation) {
-        if (SERVICE_MODE.paused.equals(currentServiceMode) || SERVICE_MODE.stopped.equals(currentServiceMode)) {
-            Log.i("service", "paused or stopped mode.. nothing to update");
-            // if service is in paused state, ignore these msgs
-            return;
-        }
         if (newLocation.getAccuracy() > MIN_ACCURACY) {
             Log.i("service", "accuracy too low: " + newLocation.getAccuracy());
             return;
         }
-        // reaches here only if current mode is started or resumed
-        if (prevLocation != null) {
-            //if previous location is not null, it doesn't matter if service was resumed or started, we calculate distance
-            Log.i("service", "prev location is not null");
-            // for both.. started and resumed
-            float distance = newLocation.distanceTo(prevLocation);
-            actualDistanceCovered += distance;
-        } else if (SERVICE_MODE.started.equals(currentServiceMode)) {
-            //if previous location is null and if mode is started, only then we will reset actualDistanceCovered
-            //if it was resumed, we need not set actualDistanceCovered
-            Log.i("service", "prev location is null and service is just started");
-            actualDistanceCovered = 0.0F;
+        switch(currentServiceMode) {
+            case started:
+            case resumed:
+                // for both.. started and resumed
+                float distance = newLocation.distanceTo(prevLocation);
+                actualDistanceCovered += distance;
+                break;
+            case starting:
+                //if previous location is null and if mode is started, only then we will reset actualDistanceCovered
+                //if it was resumed, we need not set actualDistanceCovered
+//                Log.i("service", "prev location is null and service is just started");
+                startTimeInSecs = System.currentTimeMillis() / 1000;
+                startTimeInSecs--; // decrement time so that 0 is never returned as time elapsed
+                actualDistanceCovered = 0.0F;
+                setServiceParameters(SERVICE_MODE.started);
+                break;
+            case resuming:
+                if(pausedStartTimeInMillis > 0l) {
+                    //only if we have had noted down pausedStartTime, it makes sense to subtrat it from currMillis
+                    totalPausedTimeInMillis += System.currentTimeMillis() - pausedStartTimeInMillis;
+                }
+                pausedStartTimeInMillis = 0l;
+                setServiceParameters(SERVICE_MODE.resumed);
+                break;
+            case paused:
+            case stopped:
+                // if service is in paused state, ignore these msgs
+                Log.i("service", "paused or stopped mode.. nothing to update");
+                return;
+            default:
+                return;
         }
         prevLocation = newLocation;
         updateListenersWithDistance(newLocation);

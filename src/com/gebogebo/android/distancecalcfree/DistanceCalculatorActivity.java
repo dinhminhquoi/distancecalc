@@ -3,7 +3,6 @@ package com.gebogebo.android.distancecalcfree;
 import java.util.Random;
 
 //import com.admob.android.ads.AdManager;
-import com.admob.android.ads.AdManager;
 import com.admob.android.ads.AdView;
 import com.gebogebo.android.distancecalcfree.DistanceCalculatorService.DistanceServiceBinder;
 
@@ -80,6 +79,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
             button.setText(R.string.start);
             Button pauseButton = (Button) findViewById(R.drawable.pause);
             pauseButton.setText(R.string.pause);
+            errorText.setText(R.string.empty);
             Log.i("activity", "handled on click event for button. not calculating distance now.");
         }
         SharedPreferences defPref = PreferenceManager.getDefaultSharedPreferences(this);
