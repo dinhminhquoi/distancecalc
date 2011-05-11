@@ -35,6 +35,8 @@ public class DistanceCalculatorService extends Service implements LocationListen
     private long totalPausedTimeInMillis = 0l;
     private long pausedStartTimeInMillis = 0l;
     private final DistanceServiceBinder binder = new DistanceServiceBinder();
+    private float minSpeed = Float.MAX_VALUE;
+    private float maxSpeed = 0f;
 
     /**
      * adds listener to the service
@@ -103,6 +105,9 @@ public class DistanceCalculatorService extends Service implements LocationListen
      * @return
      */
     public long getTimeElapsed() {
+        if(startTimeInSecs <= 0) {
+            return 0l;
+        }
         return (System.currentTimeMillis() - totalPausedTimeInMillis) / 1000 - startTimeInSecs;
     }
 
@@ -259,6 +264,7 @@ public class DistanceCalculatorService extends Service implements LocationListen
         }
         prevLocation = newLocation;
         updateListenersWithDistance(newLocation);
+        updateReportParameters();
     }
 
     @Override
@@ -309,5 +315,41 @@ public class DistanceCalculatorService extends Service implements LocationListen
         DistanceCalculatorService getService() {
             return DistanceCalculatorService.this;
         }
+    }
+    
+    /**
+     * updates parameters which are used to generate report for the session. called after latest obtained location is set to
+     * previous location
+     */
+    private void updateReportParameters() {
+        // updates min and max speed only if previous location has speed
+        if (prevLocation != null && prevLocation.hasSpeed()) {
+            float currentSpeed = prevLocation.getSpeed();
+            if(minSpeed > currentSpeed && currentSpeed > 0f) {
+                minSpeed = currentSpeed; 
+            }
+            if(maxSpeed < currentSpeed) {
+                maxSpeed = currentSpeed; 
+            }
+        }
+    }
+    
+    /**
+     * obtains report for this session. if service is not started yet, null is returned.
+     * 
+     * @return
+     */
+    public DistanceCalcReport getSummaryReport() {
+        //method is not called as frequently. not very critical to return as fast as we can
+        if(currentServiceMode.equals(SERVICE_MODE.stopped)) {
+            return null;
+        }
+        DistanceCalcReport report = new DistanceCalcReport();
+        report.setTotalDistance(actualDistanceCovered);
+        report.setTotalTime(getTimeElapsed());
+        report.setTotalTimePaused(totalPausedTimeInMillis > 0 ? totalPausedTimeInMillis/1000 : totalPausedTimeInMillis);
+        report.setMinSpeed(minSpeed == Float.MAX_VALUE ? 0f : minSpeed);
+        report.setMaxSpeed(maxSpeed);
+        return report;
     }
 }

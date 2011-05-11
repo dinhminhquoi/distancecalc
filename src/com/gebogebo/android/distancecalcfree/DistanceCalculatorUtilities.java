@@ -32,10 +32,24 @@ public class DistanceCalculatorUtilities {
         // Log.i("util", "visual mult: " + multiplier + " dist: " + distanceSuffix);
         int viewingDistance = (int) (newDistanceInMeters * multiplier);
         // speed is always calculated per hour basis
-        float speed = (float) (newDistanceInMeters * 3.6 * multiplier) / totalTimeInSecs; // 3.6 = 3600 min / 1000 (for
-                                                                                          // meters to km)
+        float speed = (float) (newDistanceInMeters * 3.6 * multiplier) / totalTimeInSecs; 
+        // 3.6 = 3600 min / 1000 (for meters to km)
         return String.format("%.3f %s at %.2f %s/%s", (float) viewingDistance / 1000, distanceSuffix, speed,
                 distanceSuffix, hourStr);
+    }
+
+    /**
+     * obtains report specific string for distance
+     * 
+     * @param distanceInMeters distance in meters
+     * @param multiplier multiplier to use to get distance in user selected unit
+     * @param distanceSuffix suffix as per unit selected by user
+     * @return formatted, displayable string to display distance in report
+     */
+    public String getDistanceForReport(float distanceInMeters, float multiplier, String distanceSuffix) {
+        // Log.i("util", "visual mult: " + multiplier + " dist: " + distanceSuffix);
+        int viewingDistance = (int) (distanceInMeters * multiplier);
+        return String.format("%.3f %s", (float) viewingDistance / 1000, distanceSuffix);
     }
 
     /**
@@ -54,12 +68,58 @@ public class DistanceCalculatorUtilities {
     }
 
     /**
+     * returns formatted, displayable elapsed time
+     * 
+     * @param timeElapsed time in secs which is to be formatted
+     * @return formatted elapsed time
+     */
+    public String getTimeForReport(long timeElapsed) {
+        if (timeElapsed < 0) {
+            timeElapsed = 0;
+        }
+        return DateUtils.formatElapsedTime(timeElapsed);
+    }
+
+    /**
+     * obtains report specific formatted, displayable string for speed
+     * 
+     * @param speedInMetersPerSec speed in meters per second
+     * @param multiplier multiplier to use based on distance unit selected by user
+     * @param distanceSuffix suffix as per distance unit selected by user
+     * @param hourStr hour string 
+     * @return report specific formatted, displayable string for speed
+     */
+    public String getSpeedForReport(float speedInMetersPerSec, float multiplier, String distanceSuffix, String hourStr) {
+        float speed = (float) (speedInMetersPerSec * 3.6 * multiplier);
+        return String.format("%.2f %s/%s", speed, distanceSuffix, hourStr);
+    }
+
+    /**
+     * obtains report specific formatted, displayable string for average speed
+     * 
+     * @param distanceInMeters distance covered in meters
+     * @param totalTimeInSecs total time taken to cover distance
+     * @param multiplier multiplier to use based on user's selection of distance unit
+     * @param distanceSuffix distance suffix based on user's selection of distance unit
+     * @param hourStr hour string 
+     * @return report specific formatted, displayable string for average speed
+     */
+    public String getAverageSpeedForReport(float distanceInMeters, long totalTimeInSecs, float multiplier,
+            String distanceSuffix, String hourStr) {
+        float speed = 0f;
+        if (totalTimeInSecs > 0) {
+            speed = (float) (distanceInMeters * 3.6 * multiplier) / totalTimeInSecs;
+        }
+        return String.format("%.2f %s/%s", speed, distanceSuffix, hourStr);
+    }
+
+    /**
      * captures screenshot for given view object
      * 
      * @param v view whose screenshot is to be taken
      * @param c context from which view is selected
      */
-    public void saveParentView(View v, Context c) {
+    public static void saveParentView(View v, Context c) {
         v.setDrawingCacheEnabled(true);
         Bitmap bitmap = v.getDrawingCache();
         try {
