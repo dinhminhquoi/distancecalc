@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#F0F0F0"
+    >
+	     <TextView
+	         android:id="@+id/reportTitleText" 
+	         android:text="@string/reportTitle"
+	         android:textSize="@dimen/largeTextSize"
+	         android:layout_margin="2sp"
+	         android:layout_height="wrap_content"
+	         android:layout_width="fill_parent"
+	         android:gravity="center"
+	         android:layout_gravity="center"
+	         android:background="#000000"
+	         android:textColor="#FFFFFF"
+	     />
+	     
+         <TextView
+             style="@style/reportSectionHeader" 
+             android:text="@string/reportDistanceSectionHeader"
+         />
+         
+	     <LinearLayout style="@style/reportSectionLayout" >
+	         <TextView
+	             style="@style/reportSectionText.Left"
+	             android:text="@string/totalDistance"
+	         />
+	            
+	         <TextView 
+	             style="@style/reportSectionText.Right"
+	             android:id="@+id/totalDistanceCovered"
+	         />
+	    </LinearLayout>
+	    
+        <TextView
+            style="@style/reportSectionHeader"
+            android:text="@string/reportSpeedSectionHeader"
+        />
+        
+		<LinearLayout style="@style/reportSectionLayout">
+		    <TextView
+		         style="@style/reportSectionText.Left"
+		         android:text="@string/minimumSpeed"
+		    />
+		        
+		    <TextView
+		        style="@style/reportSectionText.Right"
+		        android:id="@+id/minSpeed"
+		    />
+		</LinearLayout>
+		
+		<LinearLayout style="@style/reportSectionLayout">
+		    <TextView
+		        style="@style/reportSectionText.Left"
+		        android:text="@string/maximumSpeed"
+		    />
+		       
+		    <TextView
+		        style="@style/reportSectionText.Right"
+		        android:id="@+id/maxSpeed"
+		    />
+		</LinearLayout>
+		
+		<LinearLayout style="@style/reportSectionLayout">
+		    <TextView
+		        style="@style/reportSectionText.Left"
+		        android:text="@string/averageSpeed"
+		    />
+		       
+		    <TextView 
+		        style="@style/reportSectionText.Right"
+		        android:id="@+id/avgSpeed"
+		    />
+		</LinearLayout>
+
+        <TextView
+            style="@style/reportSectionHeader"
+            android:text="@string/reportTimeSectionHeader"
+        />
+        
+		<LinearLayout style="@style/reportSectionLayout">
+		    <TextView 
+		         style="@style/reportSectionText.Left"
+		         android:text="@string/totalTimeTaken"
+		    />
+		       
+		    <TextView 
+		        style="@style/reportSectionText.Right"
+		        android:id="@+id/totalTimeTaken"
+		    />
+		</LinearLayout>
+
+		<LinearLayout style="@style/reportSectionLayout">
+		    <TextView
+		        style="@style/reportSectionText.Left"
+		        android:text="@string/totalPauseTime"
+		    />
+		       
+		    <TextView 
+		        style="@style/reportSectionText.Right"
+		        android:id="@+id/totalTimePaused"
+		    />
+		</LinearLayout>
+		
+        <LinearLayout style="@style/reportSectionLayout">
+            <TextView
+                style="@style/reportSectionText.Left"
+                android:text="@string/reportGeneratedAt"
+            />
+               
+            <TextView 
+                style="@style/reportSectionText.Right"
+                android:id="@+id/currentTime"
+            />
+        </LinearLayout>
+		
+        <TextView 
+            style="@style/warnings"
+            android:text="@string/accuracyWarning"
+        />
+</LinearLayout>

@@ -94,5 +94,5 @@
                 android:layout_weight="0.5"
                 android:textSize="@dimen/smallTextSize"
             />
-    </LinearLayout>    
+    </LinearLayout>   
 </LinearLayout>

@@ -28,7 +28,7 @@
 
 <string name="action">Action</string>
 <string name="action_summ">Choose what you are doing for optimal battery performance</string>
-<dimen name="smallTextSize">16sp</dimen><string-array name="distanceUnitValues"><item>km</item>
+<dimen name="smallTextSize">15sp</dimen><string-array name="distanceUnitValues"><item>km</item>
 <item>miles</item>
 </string-array><string-array name="actions"><item>@string/walking</item>
 <item>@string/driving</item>
@@ -51,7 +51,24 @@
 <string name="current_action">Action: %s</string>
 <string name="msg_unable_to_save">Unable to save screenshot to storage</string>
 <dimen name="largeTextSize">25sp</dimen>
+<dimen name="mediumTextSize">20sp</dimen>
+<dimen name="warningTextSize">12sp</dimen>
 <string name="timeElapsedFormat">Total time: %s</string>
 <string name="pause">Pause</string>
 <string name="resume">Resume</string>
+<string name="report">Summary</string>
+<string name="back">Back</string>
+<string name="reportGenerationError">Report cannot be generated at this moment. Please try again later.</string>
+<string name="reportTitle">Distance Calculator Summary</string>
+<string name="reportDistanceSectionHeader">Distance</string>
+<string name="totalDistance">Total Distance</string>
+<string name="reportSpeedSectionHeader">Speed</string>
+<string name="minimumSpeed">Minimum Speed</string>
+<string name="maximumSpeed">Maximum Speed</string>
+<string name="averageSpeed">Average Speed</string>
+<string name="reportTimeSectionHeader">Time</string>
+<string name="totalTimeTaken">Total Time Taken</string>
+<string name="totalPauseTime">Total Pause Time</string>
+<string name="reportGeneratedAt">Report Generated At</string>
+<string name="accuracyWarning">WARNING: All measurements are as accurate as GPS on your device</string>
 </resources>

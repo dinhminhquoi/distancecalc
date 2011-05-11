@@ -5,13 +5,8 @@
     <item android:id="@+id/menu_help" android:icon="@drawable/help" android:titleCondensed="@string/help" android:title="@string/help"></item>
     
     <item android:id="@+id/menu_capture" android:icon="@drawable/camera" android:titleCondensed="@string/capture" android:title="@string/capture"></item>
-
-    <item android:id="@+id/menu_exit" android:title="@string/exit"
-        android:icon="@drawable/exit">
-    </item>
+    <item android:id="@+id/menu_report" android:icon="@drawable/report" android:titleCondensed="@string/report" android:title="@string/report"></item>
+    <item android:id="@+id/menu_exit" android:title="@string/exit" android:icon="@drawable/exit"></item>
     
-
-
-
-
+    
 </menu>

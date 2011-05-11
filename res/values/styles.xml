@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="reportSectionLayout">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">#F0F0F0</item>
+    </style>
+    
+    <style name="reportSectionHeader">
+	    <item name="android:textSize">@dimen/mediumTextSize</item>
+	    <item name="android:layout_margin">1sp</item>
+	    <item name="android:padding">5sp</item>
+	    <item name="android:layout_height">wrap_content</item>
+	    <item name="android:layout_width">fill_parent</item>
+	    <item name="android:gravity">center</item>
+	    <item name="android:background">#3F3F3F</item>
+	    <item name="android:textColor">#FFFFFF</item>
+    </style>
+    
+    <style name="reportSectionText">
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_weight">0.5</item>
+        <item name="android:textSize">@dimen/smallTextSize</item>
+        <item name="android:background">#6F6F6F</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:padding">3sp</item>
+    </style>
+    
+    <style name="reportSectionText.Left">
+        <item name="android:layout_marginLeft">2sp</item>
+        <item name="android:gravity">left</item>
+    </style>
+    
+    <style name="reportSectionText.Right">
+        <item name="android:layout_marginRight">2sp</item>
+        <item name="android:gravity">right</item>
+    </style>
+    
+    <style name="warnings">
+        <item name="android:textSize">@dimen/warningTextSize</item>
+        <item name="android:layout_margin">2sp</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_weight">0.5</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">#000</item>
+        <item name="android:textColor">#FFF</item>
+    </style>
+
+</resources>
