@@ -21,6 +21,13 @@
             </intent-filter>
         </activity>
         
+        <activity android:name="DistanceCalculatorReportActivity">
+            <intent-filter>
+                <action android:name="action.distancecalculator.REPORT" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        
         <service android:name=".DistanceCalculatorService">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
