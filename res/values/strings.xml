@@ -50,14 +50,14 @@
 <string name="msg_file_saved">File saved at %s</string>
 <string name="current_action">Action: %s</string>
 <string name="msg_unable_to_save">Unable to save screenshot to storage</string>
-<dimen name="largeTextSize">25sp</dimen>
-<dimen name="mediumTextSize">20sp</dimen>
-<dimen name="warningTextSize">12sp</dimen>
+
+
+
 <string name="timeElapsedFormat">Total time: %s</string>
 <string name="pause">Pause</string>
 <string name="resume">Resume</string>
 <string name="report">Summary</string>
-<string name="back">Back</string>
+<string name="back">Back</string><dimen name="mediumTextSize">20sp</dimen><dimen name="largeTextSize">25sp</dimen><dimen name="warningTextSize">12sp</dimen>
 <string name="reportGenerationError">Report cannot be generated at this moment. Please try again later.</string>
 <string name="reportTitle">Distance Calculator Summary</string>
 <string name="reportDistanceSectionHeader">Distance</string>
@@ -71,4 +71,9 @@
 <string name="totalPauseTime">Total Pause Time</string>
 <string name="reportGeneratedAt">Report Generated At</string>
 <string name="accuracyWarning">WARNING: All measurements are as accurate as GPS on your device</string>
+<string name="prefAutoReport">Auto Report</string>
+<string name="prefAutoReportSummOn">Report will be displayed when calculator is stopped</string>
+<string name="prefAutoReportSummOff">Report will not be displayed when calculator is stopped</string>
+<string name="prefMeasurementUnit">Measurement Unit</string>
+<string name="prefMisc">Misc</string>
 </resources>

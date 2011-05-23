@@ -5,13 +5,13 @@
 	android:background="#000000"
 	android:layout_height="fill_parent">
 	
-    <com.admob.android.ads.AdView
-        android:id="@+id/ad"
-        android:layout_width="fill_parent"
+	<com.sensedk.AswAdLayout
+        android:id="@+id/adview"
         android:layout_height="wrap_content"
-        myapp:backgroundColor="#FFFFFF"
-        myapp:primaryTextColor="#000000"
-        myapp:secondaryTextColor="#CCCCCC" />
+        android:layout_width="fill_parent"
+        android:layout_gravity="center"
+        android:background="#fff"
+    />
 		
     <TextView
         android:id="@+drawable/errors"

@@ -121,4 +121,12 @@
             style="@style/warnings"
             android:text="@string/accuracyWarning"
         />
+        
+		<com.sensedk.AswAdLayout
+			android:id="@+id/adview"
+			android:layout_height="wrap_content"
+			android:layout_width="fill_parent"
+			android:layout_gravity="center"
+			android:background="#fff"
+		/>
 </LinearLayout>
