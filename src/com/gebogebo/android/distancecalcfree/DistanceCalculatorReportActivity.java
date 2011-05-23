@@ -1,5 +1,7 @@
 package com.gebogebo.android.distancecalcfree;
 
+import com.sensedk.AswAdLayout;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -29,6 +31,12 @@ public class DistanceCalculatorReportActivity extends Activity {
             this.finish();
         }
         setContentView(R.layout.report);
+        
+        AswAdLayout senseAd = (AswAdLayout)findViewById(R.id.adview);
+        senseAd.setActivity(this);
+        //adView.userDemandToDeleteHisData();
+        //adView.userOptOutFromRecommendation();
+
         
         TextView view = (TextView) findViewById(R.id.totalDistanceCovered);
         view.setText(report.getTotalDistanceString());

@@ -1,7 +1,7 @@
 package com.gebogebo.android.distancecalcfree;
 
 import java.text.SimpleDateFormat;
-import java.util.Random;
+//import java.util.Random;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -22,16 +22,18 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.admob.android.ads.AdView;
+//import com.admob.android.ads.AdView;
 import com.gebogebo.android.distancecalcfree.DistanceCalculatorService.DistanceServiceBinder;
+import com.sensedk.AswAdLayout;
+import com.sensedk.AswAdListener;
 
 /**
  * @author viraj
  * 
  */
-public class DistanceCalculatorActivity extends Activity implements OnClickListener, DistanceCalculatorServiceListener {
+public class DistanceCalculatorActivity extends Activity implements OnClickListener, DistanceCalculatorServiceListener, AswAdListener {
     private static final String DATE_FORMAT_NOW = "dd-MMM-yyyy HH:mm";
-    
+
     private static String currentSpeedFormat = null;
     // indicates state of app (calculating distance or not)
     private boolean isCalculatingDistance = false; 
@@ -47,7 +49,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
 
     private float multiplier = 1.0F;
     private String distanceSuffix;
-    private Random random = new Random(System.currentTimeMillis());
+//    private Random random = new Random(System.currentTimeMillis());
 
     /**
      * set activity variable as per its current operation
@@ -64,10 +66,10 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
             float actualDistance = locationService.getCurrentDistance();
             if (actualDistance >= 0.0) {
                 long timeElapsed = locationService.getTimeElapsed();
-                String visualDistance = util.getVisualDistance(actualDistance, timeElapsed, multiplier, distanceSuffix,
+                String visualDistance = DistanceCalculatorUtilities.getVisualDistance(actualDistance, timeElapsed, multiplier, distanceSuffix,
                         hoursStr);
                 distanceText.setText(visualDistance);
-                timeText.setText(util.getVisualTime(timeElapsed, timeElapsedStr));
+                timeText.setText(DistanceCalculatorUtilities.getVisualTime(timeElapsed, timeElapsedStr));
                 errorText.setText(R.string.empty);
             } else {
                 // it means that we are trying to find location of user
@@ -134,7 +136,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
     public void onDistanceChange(float newDistanceInMeters, long totalTimeInSecs, Location newLocation) {
         errorText.setText(R.string.empty);
         Log.i("serviceListener", "distance changed");
-        String visualDistance = util.getVisualDistance(newDistanceInMeters, totalTimeInSecs, multiplier,
+        String visualDistance = DistanceCalculatorUtilities.getVisualDistance(newDistanceInMeters, totalTimeInSecs, multiplier,
                 distanceSuffix, hoursStr);
         distanceText.setText(visualDistance);
         String speed = null;
@@ -143,13 +145,13 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
                     currentSpeedFormat);
             speedText.setText(speed);
         }
-        timeText.setText(util.getVisualTime(totalTimeInSecs, timeElapsedStr));
+        timeText.setText(DistanceCalculatorUtilities.getVisualTime(totalTimeInSecs, timeElapsedStr));
 
-        if (random.nextInt(10) < 3) {
-            // with a probability of 30%
-            AdView adView = (AdView) findViewById(R.id.ad);
-            adView.requestFreshAd();
-        }
+//        if (random.nextInt(10) < 3) {
+//            // with a probability of 30%
+//            AdView adView = (AdView) findViewById(R.id.ad);
+//            adView.requestFreshAd();
+//        }
     }
 
     @Override
@@ -166,7 +168,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         Log.i("activity", "set activity as content view: " + this);
-
+        
         util = new DistanceCalculatorUtilities();
         distanceText = (TextView) findViewById(R.drawable.distance);
         speedText = (TextView) findViewById(R.drawable.currentSpeed);
@@ -191,8 +193,14 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
 
         // AdManager.setTestDevices( new String[] { AdManager.TEST_EMULATOR,
         // "CA101E12F9C3DF4E8301247EF68FB13C" } );
-        AdView adView = (AdView) findViewById(R.id.ad);
-        adView.requestFreshAd();
+//        AdView adView = (AdView) findViewById(R.id.ad);
+//        adView.requestFreshAd();
+        
+        AswAdLayout senseAd = (AswAdLayout)findViewById(R.id.adview);
+        senseAd.setActivity(this);
+        senseAd.setListener(this);
+        //adView.userDemandToDeleteHisData();
+        //adView.userOptOutFromRecommendation();
     }
 
     @Override
@@ -221,14 +229,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
             Log.i("activity", "successfully captured screenshot");
         } else if (item.getItemId() == R.id.menu_report) {
             DistanceCalcReport report = getSummaryReport();
-            if (report == null) {
-                Toast.makeText(this, getString(R.string.reportGenerationError), Toast.LENGTH_LONG).show();
-                return true;
-            }
-            Intent reportIntent = new Intent("action.distancecalculator.REPORT");
-            reportIntent.putExtra("com.gebogebo.distancecalc.report", report);
-            startActivity(reportIntent);
-            Log.i("activity", "Generate report selected");
+            startReportActivity(report);
         }
         return true;
     }
@@ -272,11 +273,23 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
             // for "start/stop calculating" button
             isCalculatingDistance = !isCalculatingDistance;
             if (isCalculatingDistance) {
+                //when START is clicked
                 locationService.start();
                 locationService.addListener(this);
             } else {
+                //when STOP is clicked
+                SharedPreferences defPref = PreferenceManager.getDefaultSharedPreferences(this);
+                boolean autoReport = defPref.getBoolean(DistanceCalculatorPrefActivity.PREF_KEY_AUTO_REPORT, false);
+                Log.i("activity", "auto report is: " + autoReport);
+                DistanceCalcReport report = null;
+                if(autoReport) {
+                    report = getSummaryReport();
+                }
                 locationService.removeListener(this);
                 locationService.stop();
+                if(report != null) {
+                    startReportActivity(report);
+                }
             }
             setActivityState();
         } else if (v.getId() == R.drawable.pause && isCalculatingDistance) {
@@ -293,30 +306,62 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
             }
         }
     }
-
+    
+    /**
+     * starts the report activity for given report object. if given report object is null, error message
+     * is displayed and nothing else is done
+     * 
+     * @param report object containing information required to display report activity
+     */
+    private void startReportActivity(DistanceCalcReport report) {
+        if (report == null) {
+            Toast.makeText(this, getString(R.string.reportGenerationError), Toast.LENGTH_LONG).show();
+            return;
+        }
+        Intent reportIntent = new Intent("action.distancecalculator.REPORT");
+        reportIntent.putExtra("com.gebogebo.distancecalc.report", report);
+        startActivity(reportIntent);
+        Log.i("activity", "Generate report selected");
+    }
+    
     /**
      * obtains summary report object for this session. returns null if report can't be generated for some reason
      * 
      * @return report object for this session
      */
-    public DistanceCalcReport getSummaryReport() {
+    private DistanceCalcReport getSummaryReport() {
         Log.i("mainactivity", "generating report");
         // obtains report object from service and populates strings as per user preferences
         DistanceCalcReport report = locationService.getSummaryReport();
         if (report == null) {
             return null;
         }
-
-        report.setTotalDistanceString(util.getDistanceForReport(report.getTotalDistance(), multiplier, distanceSuffix));
-        report.setTotalTimeString(util.getTimeForReport(report.getTotalTime()));
-        report.setTotalTimePausedString(util.getTimeForReport(report.getTotalTimePaused()));
-        report.setMinSpeedString(util.getSpeedForReport(report.getMinSpeed(), multiplier, distanceSuffix, hoursStr));
-        report.setMaxSpeedString(util.getSpeedForReport(report.getMaxSpeed(), multiplier, distanceSuffix, hoursStr));
-        report.setAvgSpeed(util.getAverageSpeedForReport(report.getTotalDistance(), report.getTotalTime(), multiplier,
+     
+        report.setTotalDistanceString(DistanceCalculatorUtilities.getDistanceForReport(report.getTotalDistance(), multiplier, distanceSuffix));
+        report.setTotalTimeString(DistanceCalculatorUtilities.getTimeForReport(report.getTotalTime()));
+        report.setTotalTimePausedString(DistanceCalculatorUtilities.getTimeForReport(report.getTotalTimePaused()));
+        report.setMinSpeedString(DistanceCalculatorUtilities.getSpeedForReport(report.getMinSpeed(), multiplier, distanceSuffix, hoursStr));
+        report.setMaxSpeedString(DistanceCalculatorUtilities.getSpeedForReport(report.getMaxSpeed(), multiplier, distanceSuffix, hoursStr));
+        report.setAvgSpeed(DistanceCalculatorUtilities.getAverageSpeedForReport(report.getTotalDistance(), report.getTotalTime(), multiplier,
                 distanceSuffix, hoursStr));
-        
+
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
         report.setCurrentTime(sdf.format(System.currentTimeMillis()));
         return report;
+    }
+
+    @Override
+    public void onAdClicked(int arg0) {
+        Log.w("ad", "sense ad is clicked");
+    }
+
+    @Override
+    public void onAdFailedToLoad(int arg0) {
+        Log.w("ad", "sense ad failed to load");
+    }
+
+    @Override
+    public void onAdReceived(int arg0) {
+        Log.w("ad", "sense ad received");
     }
 }

@@ -14,6 +14,7 @@ public class DistanceCalculatorPrefActivity extends PreferenceActivity {
 	//preference constants for this app
     public static final String PREF_KEY_DISTANCE_UNIT = "distanceUnit";
     public static final String PREF_KEY_ACTION = "action";
+    public static final String PREF_KEY_AUTO_REPORT = "autoReport";
     //distance unit constants
     public static final String PREF_MILES = "miles";
     public static final String PREF_KM = "km";
