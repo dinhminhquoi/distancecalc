@@ -16,7 +16,7 @@ import android.view.View;
 import android.widget.Toast;
 
 public class DistanceCalculatorUtilities {
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MMM.DD_HH.mm.ss");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MMM.dd_HH.mm.ss");
     private static final String SCREENSHOT_DIR = "distancecalc";
 
     /**
@@ -27,7 +27,7 @@ public class DistanceCalculatorUtilities {
      * @param distanceSuffix distance suffix to be used based on distance unit
      * @return
      */
-    public String getVisualDistance(float newDistanceInMeters, long totalTimeInSecs, float multiplier,
+    public static String getVisualDistance(float newDistanceInMeters, long totalTimeInSecs, float multiplier,
             String distanceSuffix, String hourStr) {
         // Log.i("util", "visual mult: " + multiplier + " dist: " + distanceSuffix);
         int viewingDistance = (int) (newDistanceInMeters * multiplier);
@@ -46,7 +46,7 @@ public class DistanceCalculatorUtilities {
      * @param distanceSuffix suffix as per unit selected by user
      * @return formatted, displayable string to display distance in report
      */
-    public String getDistanceForReport(float distanceInMeters, float multiplier, String distanceSuffix) {
+    public static String getDistanceForReport(float distanceInMeters, float multiplier, String distanceSuffix) {
         // Log.i("util", "visual mult: " + multiplier + " dist: " + distanceSuffix);
         int viewingDistance = (int) (distanceInMeters * multiplier);
         return String.format("%.3f %s", (float) viewingDistance / 1000, distanceSuffix);
@@ -60,7 +60,7 @@ public class DistanceCalculatorUtilities {
      * 
      * @return formatted string representation of passed number of seconds
      */
-    public String getVisualTime(long timeElapsed, String timeElapsedFormattedString) {
+    public static String getVisualTime(long timeElapsed, String timeElapsedFormattedString) {
         if (timeElapsed < 0) {
             timeElapsed = 0;
         }
@@ -73,7 +73,7 @@ public class DistanceCalculatorUtilities {
      * @param timeElapsed time in secs which is to be formatted
      * @return formatted elapsed time
      */
-    public String getTimeForReport(long timeElapsed) {
+    public static String getTimeForReport(long timeElapsed) {
         if (timeElapsed < 0) {
             timeElapsed = 0;
         }
@@ -89,7 +89,7 @@ public class DistanceCalculatorUtilities {
      * @param hourStr hour string 
      * @return report specific formatted, displayable string for speed
      */
-    public String getSpeedForReport(float speedInMetersPerSec, float multiplier, String distanceSuffix, String hourStr) {
+    public static String getSpeedForReport(float speedInMetersPerSec, float multiplier, String distanceSuffix, String hourStr) {
         float speed = (float) (speedInMetersPerSec * 3.6 * multiplier);
         return String.format("%.2f %s/%s", speed, distanceSuffix, hourStr);
     }
@@ -104,7 +104,7 @@ public class DistanceCalculatorUtilities {
      * @param hourStr hour string 
      * @return report specific formatted, displayable string for average speed
      */
-    public String getAverageSpeedForReport(float distanceInMeters, long totalTimeInSecs, float multiplier,
+    public static String getAverageSpeedForReport(float distanceInMeters, long totalTimeInSecs, float multiplier,
             String distanceSuffix, String hourStr) {
         float speed = 0f;
         if (totalTimeInSecs > 0) {
