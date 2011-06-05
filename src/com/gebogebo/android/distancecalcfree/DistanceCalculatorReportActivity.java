@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,18 +19,28 @@ import android.widget.Toast;
  * @author shweta
  */
 public class DistanceCalculatorReportActivity extends Activity {
+    public static final String INTENT_PARAM_AUTO_SAVE = "com.gebogebo.distancecalcpaid.report.autosave";
+    public static final String INTENT_PARAM_AUTO_REPORT = "com.gebogebo.distancecalc.report";
+    
+    private boolean saveWhenRendered = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        DistanceCalcReport report = (DistanceCalcReport)getIntent().getSerializableExtra("com.gebogebo.distancecalc.report");
+        DistanceCalcReport report = (DistanceCalcReport)getIntent().getSerializableExtra(INTENT_PARAM_AUTO_REPORT);
         if(report == null) {
             //if report object is not set in intent, show error and go back
             Toast.makeText(this, R.string.reportGenerationError, Toast.LENGTH_LONG).show();
             this.finish();
         }
+        if (getIntent().getSerializableExtra(INTENT_PARAM_AUTO_SAVE) != null) {
+            Log.i("report", "trying to see if report needs to be saved after rendered");
+            saveWhenRendered = (Boolean) getIntent().getSerializableExtra(INTENT_PARAM_AUTO_SAVE);
+        }
+        Log.i("report", "saveWhenRendered: " + saveWhenRendered);
+        
         setContentView(R.layout.report);
         
         AswAdLayout senseAd = (AswAdLayout)findViewById(R.id.adview);
@@ -58,6 +69,18 @@ public class DistanceCalculatorReportActivity extends Activity {
         
         view = (TextView) findViewById(R.id.currentTime);
         view.setText(report.getCurrentTime());
+    }
+    
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        // this activity is used specially when report is to be saved when rendered. it is important
+        // that report is saved only when rendered so as to get its dimensions correctly
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && saveWhenRendered) {
+            saveWhenRendered = false;
+            View v = findViewById(R.id.reportTitleText).getRootView();
+            DistanceCalculatorUtilities.saveParentView(v, this);
+        }
     }
 
     @Override

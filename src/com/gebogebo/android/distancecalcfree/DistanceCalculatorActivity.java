@@ -229,7 +229,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
             Log.i("activity", "successfully captured screenshot");
         } else if (item.getItemId() == R.id.menu_report) {
             DistanceCalcReport report = getSummaryReport();
-            startReportActivity(report);
+            startReportActivity(report, false);
         }
         return true;
     }
@@ -281,14 +281,20 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
                 SharedPreferences defPref = PreferenceManager.getDefaultSharedPreferences(this);
                 boolean autoReport = defPref.getBoolean(DistanceCalculatorPrefActivity.PREF_KEY_AUTO_REPORT, false);
                 Log.i("activity", "auto report is: " + autoReport);
+                
+                boolean autoSave = false;
                 DistanceCalcReport report = null;
                 if(autoReport) {
+                    autoSave = defPref.getBoolean(DistanceCalculatorPrefActivity.PREF_KEY_AUTO_SAVE, false);
                     report = getSummaryReport();
                 }
+                Log.i("activity", "auto save is: " + autoSave);
+                
                 locationService.removeListener(this);
                 locationService.stop();
+                
                 if(report != null) {
-                    startReportActivity(report);
+                    startReportActivity(report, autoSave);
                 }
             }
             setActivityState();
@@ -312,14 +318,16 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
      * is displayed and nothing else is done
      * 
      * @param report object containing information required to display report activity
+     * @param saveWhenRendered will save the report automatically when rendered fully on screen
      */
-    private void startReportActivity(DistanceCalcReport report) {
+    private void startReportActivity(DistanceCalcReport report, boolean saveWhenRendered) {
         if (report == null) {
             Toast.makeText(this, getString(R.string.reportGenerationError), Toast.LENGTH_LONG).show();
             return;
         }
         Intent reportIntent = new Intent("action.distancecalculator.REPORT");
-        reportIntent.putExtra("com.gebogebo.distancecalc.report", report);
+        reportIntent.putExtra(DistanceCalculatorReportActivity.INTENT_PARAM_AUTO_REPORT, report);
+        reportIntent.putExtra(DistanceCalculatorReportActivity.INTENT_PARAM_AUTO_SAVE, saveWhenRendered);
         startActivity(reportIntent);
         Log.i("activity", "Generate report selected");
     }
