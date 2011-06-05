@@ -76,4 +76,7 @@
 <string name="prefAutoReportSummOff">Report will not be displayed when calculator is stopped</string>
 <string name="prefMeasurementUnit">Measurement Unit</string>
 <string name="prefMisc">Misc</string>
+<string name="prefAutoSave">Auto Save</string>
+<string name="prefAutoSaveSummOn">Report will be saved automatically when calculator is stopped</string>
+<string name="prefAutoSaveSummOff">Report will not be saved automatically when calculator is stopped</string>
 </resources>

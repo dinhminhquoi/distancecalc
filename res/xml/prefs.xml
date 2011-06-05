@@ -8,8 +8,15 @@
             android:defaultValue="false"
             android:summaryOn="@string/prefAutoReportSummOn"
             android:summaryOff="@string/prefAutoReportSummOff"
-        >
-        </CheckBoxPreference>
+        />
+        <CheckBoxPreference
+            android:title="@string/prefAutoSave"
+            android:key="autoSave"
+            android:dependency="autoReport"
+            android:defaultValue="false"
+            android:summaryOn="@string/prefAutoSaveSummOn"
+            android:summaryOff="@string/prefAutoSaveSummOff"
+        />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/prefMeasurementUnit">
         <ListPreference
