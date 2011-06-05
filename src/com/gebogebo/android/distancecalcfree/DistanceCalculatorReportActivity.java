@@ -43,10 +43,14 @@ public class DistanceCalculatorReportActivity extends Activity {
         
         setContentView(R.layout.report);
         
-        AswAdLayout senseAd = (AswAdLayout)findViewById(R.id.adview);
-        senseAd.setActivity(this);
-        //adView.userDemandToDeleteHisData();
-        //adView.userOptOutFromRecommendation();
+        try {
+            AswAdLayout senseAd = (AswAdLayout)findViewById(R.id.adview);
+            senseAd.setActivity(this);
+            //adView.userDemandToDeleteHisData();
+            //adView.userOptOutFromRecommendation();
+        } catch(Throwable t) {
+            //ignore
+        }
 
         
         TextView view = (TextView) findViewById(R.id.totalDistanceCovered);

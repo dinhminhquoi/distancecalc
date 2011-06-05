@@ -196,11 +196,15 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
 //        AdView adView = (AdView) findViewById(R.id.ad);
 //        adView.requestFreshAd();
         
-        AswAdLayout senseAd = (AswAdLayout)findViewById(R.id.adview);
-        senseAd.setActivity(this);
-        senseAd.setListener(this);
-        //adView.userDemandToDeleteHisData();
-        //adView.userOptOutFromRecommendation();
+        try {
+            AswAdLayout senseAd = (AswAdLayout)findViewById(R.id.adview);
+            senseAd.setActivity(this);
+            senseAd.setListener(this);
+            //adView.userDemandToDeleteHisData();
+            //adView.userOptOutFromRecommendation();
+        } catch (Throwable t) {
+            //ignore
+        }
     }
 
     @Override
