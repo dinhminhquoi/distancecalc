@@ -9,11 +9,13 @@
 			android:value="6e8a1a83b492f9e04f81d58ad6b001dc" />
 		<!-- AD MOB: START -->
 		<activity android:name="com.google.ads.AdActivity"
+		    android:screenOrientation="portrait"
 		    android:configChanges="keyboard|keyboardHidden|orientation"/>
 		<!-- AD MOB: END -->
 		<!-- MILLENNIAL: START -->
 		<activity
 			android:name="com.millennialmedia.android.MMAdViewOverlayActivity"
+			android:screenOrientation="portrait"
 			android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
 			<activity android:name="com.millennialmedia.android.VideoPlayer"
 			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
@@ -26,7 +28,8 @@
 			android:multiprocess="true"
 			android:exported="false" />
 		<activity android:name="com.greystripe.android.sdk.AdView"
-		    android:configChanges="keyboard|keyboardHidden|orientation" >
+		    android:configChanges="keyboard|keyboardHidden|orientation"
+		    android:screenOrientation="portrait" >
 			<intent-filter>
 				<category
 				    android:name="android.intent.category.LAUNCHER" />
@@ -35,14 +38,14 @@
 		<!-- GREYSTRIPE: END -->
     
         <activity android:label="@string/app_name" android:name="DistanceCalculatorActivity"
-                  android:launchMode="singleTask">
+                  android:screenOrientation="portrait" android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         
-        <activity android:name="DistanceCalculatorPrefActivity">
+        <activity android:name="DistanceCalculatorPrefActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.EDIT" />
                 <category android:name="android.intent.category.PREFERENCE" />
@@ -50,7 +53,7 @@
             </intent-filter>
         </activity>
         
-        <activity android:name="DistanceCalculatorReportActivity">
+        <activity android:name="DistanceCalculatorReportActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="action.distancecalculator.REPORT" />
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -68,7 +71,8 @@
 		<!-- AdMobActivity definition -->
 		<activity android:name="com.admob.android.ads.AdMobActivity"
         		  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-		          android:configChanges="orientation|keyboard|keyboardHidden" />
+        		  android:screenOrientation="portrait"
+        		  android:configChanges="orientation|keyboard|keyboardHidden" />
 	    <!-- Track Market installs -->
         <receiver android:name="com.admob.android.ads.analytics.InstallReceiver"
                   android:exported="true">
