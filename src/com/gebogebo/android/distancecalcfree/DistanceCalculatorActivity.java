@@ -1,7 +1,7 @@
 package com.gebogebo.android.distancecalcfree;
 
 import java.text.SimpleDateFormat;
-//import java.util.Random;
+import java.util.Random;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -19,19 +19,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-//import com.admob.android.ads.AdView;
 import com.gebogebo.android.distancecalcfree.DistanceCalculatorService.DistanceServiceBinder;
-import com.sensedk.AswAdLayout;
-import com.sensedk.AswAdListener;
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
 
 /**
  * @author viraj
  * 
  */
-public class DistanceCalculatorActivity extends Activity implements OnClickListener, DistanceCalculatorServiceListener, AswAdListener {
+public class DistanceCalculatorActivity extends Activity implements OnClickListener, DistanceCalculatorServiceListener {
     private static final String DATE_FORMAT_NOW = "dd-MMM-yyyy HH:mm";
 
     private static String currentSpeedFormat = null;
@@ -49,7 +50,8 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
 
     private float multiplier = 1.0F;
     private String distanceSuffix;
-//    private Random random = new Random(System.currentTimeMillis());
+    private Random random = new Random(System.currentTimeMillis());
+    private AdView adView = null;
 
     /**
      * set activity variable as per its current operation
@@ -147,11 +149,10 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         }
         timeText.setText(DistanceCalculatorUtilities.getVisualTime(totalTimeInSecs, timeElapsedStr));
 
-//        if (random.nextInt(10) < 3) {
-//            // with a probability of 30%
-//            AdView adView = (AdView) findViewById(R.id.ad);
-//            adView.requestFreshAd();
-//        }
+        if (random.nextInt(10) < 3 && adView != null) {
+            // with a probability of 30%
+            adView.loadAd(new AdRequest());
+        }
     }
 
     @Override
@@ -193,18 +194,9 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
 
         // AdManager.setTestDevices( new String[] { AdManager.TEST_EMULATOR,
         // "CA101E12F9C3DF4E8301247EF68FB13C" } );
-//        AdView adView = (AdView) findViewById(R.id.ad);
-//        adView.requestFreshAd();
-        
-        try {
-            AswAdLayout senseAd = (AswAdLayout)findViewById(R.id.adview);
-            senseAd.setActivity(this);
-            senseAd.setListener(this);
-            //adView.userDemandToDeleteHisData();
-            //adView.userOptOutFromRecommendation();
-        } catch (Throwable t) {
-            //ignore
-        }
+        adView = new AdView(this, AdSize.BANNER, DistanceCalculatorUtilities.ADMOB_KEY);
+        adView.loadAd(new AdRequest());
+        ((LinearLayout)findViewById(R.id.mainLayout)).addView(adView);
     }
 
     @Override
@@ -360,20 +352,5 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
         report.setCurrentTime(sdf.format(System.currentTimeMillis()));
         return report;
-    }
-
-    @Override
-    public void onAdClicked(int arg0) {
-        Log.w("ad", "sense ad is clicked");
-    }
-
-    @Override
-    public void onAdFailedToLoad(int arg0) {
-        Log.w("ad", "sense ad failed to load");
-    }
-
-    @Override
-    public void onAdReceived(int arg0) {
-        Log.w("ad", "sense ad received");
     }
 }

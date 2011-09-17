@@ -43,7 +43,7 @@
 </string-array>
 <string name="Hr">Hr</string>
 
-<string name="currSpeedFormat">Current speed: %.2f %s/%s</string>
+<string name="currSpeedFormat" formatted="false">Current speed: %.2f %s/%s</string>
 <string name="help">Help</string>
 <string name="capture">Capture</string>
 <string name="msg_no_storage">No external storage found to save screenshot</string>

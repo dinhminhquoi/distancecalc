@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Toast;
 
 public class DistanceCalculatorUtilities {
+    public static final String ADMOB_KEY = "a14d09d21af1d1f";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MMM.dd_HH.mm.ss");
     private static final String SCREENSHOT_DIR = "distancecalc";
 

@@ -125,6 +125,8 @@ public class DistanceCalculatorService extends Service implements LocationListen
                 actualDistanceCovered = -1.0F;
                 totalPausedTimeInMillis = 0l;
                 pausedStartTimeInMillis = 0l;
+                minSpeed = Float.MAX_VALUE;
+                maxSpeed = 0f;
                 SharedPreferences defPref = PreferenceManager.getDefaultSharedPreferences(this);
                 action = defPref.getString(DistanceCalculatorPrefActivity.PREF_KEY_ACTION,
                         DistanceCalculatorPrefActivity.PREF_BIKING);
