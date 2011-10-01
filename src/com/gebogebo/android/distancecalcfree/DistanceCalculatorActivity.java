@@ -4,7 +4,10 @@ import java.text.SimpleDateFormat;
 import java.util.Random;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -34,6 +37,7 @@ import com.google.ads.AdView;
  */
 public class DistanceCalculatorActivity extends Activity implements OnClickListener, DistanceCalculatorServiceListener {
     private static final String DATE_FORMAT_NOW = "dd-MMM-yyyy HH:mm";
+    private static final int GPS_NOT_ENABLED_DIALOG = 1224231;
 
     private static String currentSpeedFormat = null;
     // indicates state of app (calculating distance or not)
@@ -270,8 +274,14 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
             isCalculatingDistance = !isCalculatingDistance;
             if (isCalculatingDistance) {
                 //when START is clicked
-                locationService.start();
-                locationService.addListener(this);
+                try {
+                    locationService.start();
+                    locationService.addListener(this);
+                } catch(IllegalStateException e) {
+                    Log.i("activity", "gps is not enabled. app can't be started");
+                    isCalculatingDistance = !isCalculatingDistance;
+                    showDialog(GPS_NOT_ENABLED_DIALOG);
+                }
             } else {
                 //when STOP is clicked
                 SharedPreferences defPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -299,12 +309,18 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
             isPaused = !isPaused;
             Button pauseButton = (Button) v;
             if (isPaused) {
-                pauseButton.setText(R.string.resume);
                 locationService.pause();
+                pauseButton.setText(R.string.resume);
             } else {
-                pauseButton.setText(R.string.pause);
-                locationService.resume();
-                errorText.setText(R.string.service_temp_not_available);
+                try {
+                    locationService.resume();
+                    pauseButton.setText(R.string.pause);
+                    errorText.setText(R.string.service_temp_not_available);
+                } catch(IllegalStateException e) {
+                    Log.i("activity", "gps is not enabled. app can't be started");
+                    isPaused = !isPaused;
+                    showDialog(GPS_NOT_ENABLED_DIALOG);
+                }
             }
         }
     }
@@ -326,6 +342,41 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         reportIntent.putExtra(DistanceCalculatorReportActivity.INTENT_PARAM_AUTO_SAVE, saveWhenRendered);
         startActivity(reportIntent);
         Log.i("activity", "Generate report selected");
+    }
+    
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        Dialog dialog = null;
+        switch (id) {
+            case GPS_NOT_ENABLED_DIALOG:
+                dialog = generateGpsDisabledAlert();
+                break;
+            default:
+                dialog = super.onCreateDialog(id);
+                break;
+        }
+        return dialog;
+    }
+
+    private Dialog generateGpsDisabledAlert() {
+        Log.i("activity", "generating error box to enable GPS");
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+        alertBuilder.setCancelable(true)
+            .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                }
+            })
+            .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            })
+            .setMessage(getString(R.string.enableGpsDialogMsg));
+        Log.i("activity", "gps disabled dialog created");
+        return alertBuilder.create();
     }
     
     /**

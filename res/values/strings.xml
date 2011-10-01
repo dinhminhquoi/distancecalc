@@ -79,4 +79,7 @@
 <string name="prefAutoSave">Auto Save</string>
 <string name="prefAutoSaveSummOn">Report will be saved automatically when calculator is stopped</string>
 <string name="prefAutoSaveSummOff">Report will not be saved automatically when calculator is stopped</string>
+<string name="yes">Yes</string>
+<string name="no">No</string>
+<string name="enableGpsDialogMsg">GPS is not enabled. Do you want to enable it now?</string>
 </resources>

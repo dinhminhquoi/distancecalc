@@ -120,7 +120,6 @@ public class DistanceCalculatorService extends Service implements LocationListen
     private void setServiceParameters(SERVICE_MODE mode) {
         switch (mode) {
             case starting:
-                goForeground();
                 prevLocation = null;
                 actualDistanceCovered = -1.0F;
                 totalPausedTimeInMillis = 0l;
@@ -131,6 +130,7 @@ public class DistanceCalculatorService extends Service implements LocationListen
                 action = defPref.getString(DistanceCalculatorPrefActivity.PREF_KEY_ACTION,
                         DistanceCalculatorPrefActivity.PREF_BIKING);
                 startListeningToLocationEvents();
+                goForeground();
                 break;
             case paused:
                 if (SERVICE_MODE.paused.equals(currentServiceMode)) {
@@ -172,15 +172,27 @@ public class DistanceCalculatorService extends Service implements LocationListen
      * starts listening to location events from locationmanager. location events parameters are obtained from the
      * parameters which are set by user
      */
-    private void startListeningToLocationEvents() {
+    private void startListeningToLocationEvents() throws IllegalStateException {
         Integer gpsFreqInMillis = DistanceCalculatorPrefActivity.getFrequencyInMillisForAction(action);
         Integer gpsFreqInDistance = DistanceCalculatorPrefActivity.getFrequencyInMetersForAction(action);
         Log.i("service", "action " + action + ": distance=" + gpsFreqInDistance + " ,freq=" + gpsFreqInMillis);
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        validateGpsEnabled();
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, gpsFreqInMillis, gpsFreqInDistance, this);
         Log.i("service", "Started listening to location changes");
     }
-
+    
+    /**
+     * validates if GPS is enabled or not. if it is not enabled, {@link IllegalStateException} is thrown
+     */
+    private void validateGpsEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Log.w("service", "gps is not activated. throwing exception");
+            throw new IllegalStateException("GPS service is not enabled");
+        }
+    }
+    
     /**
      * updates all interested parties with change in distance
      * 
