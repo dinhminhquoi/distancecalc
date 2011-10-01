@@ -358,6 +358,11 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         return dialog;
     }
 
+    /**
+     * method generates a dialog box to ask user to enable GPS for Distance Calculator to run
+     * 
+     * @return generated dialog box
+     */
     private Dialog generateGpsDisabledAlert() {
         Log.i("activity", "generating error box to enable GPS");
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
