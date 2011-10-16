@@ -1,5 +1,7 @@
 package com.gebogebo.android.distancecalcfree;
 
+import static java.lang.String.format;
+
 import java.text.SimpleDateFormat;
 import java.util.Random;
 
@@ -12,6 +14,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -37,7 +41,12 @@ import com.google.ads.AdView;
  */
 public class DistanceCalculatorActivity extends Activity implements OnClickListener, DistanceCalculatorServiceListener {
     private static final String DATE_FORMAT_NOW = "dd-MMM-yyyy HH:mm";
-    private static final int GPS_NOT_ENABLED_DIALOG = 1224231;
+    private static final int GPS_NOT_ENABLED_START = 100;
+    private static final int GPS_NOT_ENABLED_RESUME = 101;
+    private static final int GPS_SWITCHED_OFF = 102;
+    private static final int GPS_ENABLE_ACTIVITY_START = 1;
+    private static final int GPS_ENABLE_ACTIVITY_RESUME = 2;
+    private static final int DISTANCE_CALC_PREF_CHANGE = 3;
 
     private static String currentSpeedFormat = null;
     // indicates state of app (calculating distance or not)
@@ -160,8 +169,12 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
     }
 
     @Override
-    public void onServiceStatusChange(int errorCode) {
-        int textId = util.getErrorTextId(errorCode);
+    public void onServiceStatusChange(int statusCode) {
+        Log.i("activity", "status changed. statusCode: " + statusCode);
+        if(statusCode == LocationProvider.TEMPORARILY_UNAVAILABLE && isCalculatingDistance) {
+           showDialog(GPS_SWITCHED_OFF);
+        }
+        int textId = util.getErrorTextId(statusCode);
         if (textId > 0) {
             errorText.setText(textId);
         }
@@ -261,15 +274,37 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i("activity", format("received activity result. request %s, result %s, isPaused %s, isCalculating %s", requestCode, resultCode,
+                isPaused, isCalculatingDistance));
         super.onActivityResult(requestCode, resultCode, data);
-        // there is only one activity we call.. so no checks are added here
-        setDistanceParameters();
+        switch(requestCode) {
+            case GPS_ENABLE_ACTIVITY_RESUME:
+                handleButtonClick(R.drawable.pause);
+                break;
+            case GPS_ENABLE_ACTIVITY_START:
+                handleButtonClick(R.drawable.button);
+                break;
+            case DISTANCE_CALC_PREF_CHANGE:
+                setDistanceParameters();
+                break;
+            default:
+                Log.i("activity", format("nothing to do. req %s, result %s", requestCode, resultCode));
+        }
     }
-
+    
     // onClickListener overrides
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.drawable.button) {
+        handleButtonClick(v.getId());
+    }
+
+    /**
+     * processes button click based on which button is clicked and app's state 
+     * 
+     * @param buttonId button id which is clicked (or button click which is to be simulated)
+     */
+    private void handleButtonClick(int buttonId) {
+        if (buttonId == R.drawable.button) {
             // for "start/stop calculating" button
             isCalculatingDistance = !isCalculatingDistance;
             if (isCalculatingDistance) {
@@ -280,7 +315,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
                 } catch(IllegalStateException e) {
                     Log.i("activity", "gps is not enabled. app can't be started");
                     isCalculatingDistance = !isCalculatingDistance;
-                    showDialog(GPS_NOT_ENABLED_DIALOG);
+                    showDialog(GPS_NOT_ENABLED_START);
                 }
             } else {
                 //when STOP is clicked
@@ -304,10 +339,10 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
                 }
             }
             setActivityState();
-        } else if (v.getId() == R.drawable.pause && isCalculatingDistance) {
+        } else if (buttonId == R.drawable.pause && isCalculatingDistance) {
             // pause/resume only makes sense if system is calculating distance
             isPaused = !isPaused;
-            Button pauseButton = (Button) v;
+            Button pauseButton = (Button) findViewById(buttonId);
             if (isPaused) {
                 locationService.pause();
                 pauseButton.setText(R.string.resume);
@@ -319,7 +354,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
                 } catch(IllegalStateException e) {
                     Log.i("activity", "gps is not enabled. app can't be started");
                     isPaused = !isPaused;
-                    showDialog(GPS_NOT_ENABLED_DIALOG);
+                    showDialog(GPS_NOT_ENABLED_RESUME);
                 }
             }
         }
@@ -346,10 +381,17 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
     
     @Override
     protected Dialog onCreateDialog(int id) {
+        Log.i("activity", format("creating dialog. id %s, isPaused %s, isCalculating %s", id, isPaused, isCalculatingDistance));
         Dialog dialog = null;
         switch (id) {
-            case GPS_NOT_ENABLED_DIALOG:
-                dialog = generateGpsDisabledAlert();
+            case GPS_NOT_ENABLED_START:
+                dialog = generateGpsDisabledAlert(GPS_ENABLE_ACTIVITY_START);                    
+                break;
+            case GPS_NOT_ENABLED_RESUME:
+                dialog = generateGpsDisabledAlert(GPS_ENABLE_ACTIVITY_RESUME);
+                break;
+            case GPS_SWITCHED_OFF:
+                dialog = generateGpsDisabledAlert(GPS_SWITCHED_OFF);
                 break;
             default:
                 dialog = super.onCreateDialog(id);
@@ -357,20 +399,21 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         }
         return dialog;
     }
-
+    
     /**
      * method generates a dialog box to ask user to enable GPS for Distance Calculator to run
      * 
      * @return generated dialog box
      */
-    private Dialog generateGpsDisabledAlert() {
+    private Dialog generateGpsDisabledAlert(final int requestCode) {
         Log.i("activity", "generating error box to enable GPS");
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setCancelable(true)
             .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                    startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), requestCode);
+                    //startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                 }
             })
             .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
@@ -383,7 +426,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         Log.i("activity", "gps disabled dialog created");
         return alertBuilder.create();
     }
-    
+
     /**
      * obtains summary report object for this session. returns null if report can't be generated for some reason
      * 
