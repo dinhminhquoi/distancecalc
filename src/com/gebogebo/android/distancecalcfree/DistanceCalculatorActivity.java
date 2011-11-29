@@ -14,7 +14,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
@@ -183,6 +182,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
     // activity overrides
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        DistanceCalculatorUtilities.deleteTempFiles();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         Log.i("activity", "set activity as content view: " + this);
@@ -227,18 +227,29 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_exit) {
             Log.i("activity", "Exit selected");
+            DistanceCalculatorUtilities.deleteTempFiles();
             this.finish();
         } else if (item.getItemId() == R.id.settings) {
             Log.i("activity", "Settings selected");
             Intent prefIntent = new Intent(Intent.ACTION_EDIT);
             prefIntent.addCategory(Intent.CATEGORY_PREFERENCE);
             startActivityForResult(prefIntent, 1);
+        } else if(item.getItemId() == R.id.share) {
+            Log.i("menu", "Share with selected");
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("image/png");
+            String tmpFilename =  DistanceCalculatorUtilities.saveParentView(distanceText.getRootView(), this, true);
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + tmpFilename));
+            startActivity(Intent.createChooser(intent, getString(R.string.share)));
         } else if (item.getItemId() == R.id.menu_help) {
             Log.i("activity", "Help selected");
             Intent helpIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://distancecalculator.gebogebo.com/help"));
             startActivity(helpIntent);
         } else if (item.getItemId() == R.id.menu_capture) {
-            DistanceCalculatorUtilities.saveParentView(distanceText.getRootView(), this);
+            String filename = DistanceCalculatorUtilities.saveParentView(distanceText.getRootView(), this, false);
+            if(filename != null) {
+                Toast.makeText(this, String.format(this.getString(R.string.msg_file_saved), filename), Toast.LENGTH_LONG).show();
+            }
             Log.i("activity", "successfully captured screenshot");
         } else if (item.getItemId() == R.id.menu_report) {
             DistanceCalcReport report = getSummaryReport();
@@ -413,7 +424,6 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), requestCode);
-                    //startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
                 }
             })
             .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {

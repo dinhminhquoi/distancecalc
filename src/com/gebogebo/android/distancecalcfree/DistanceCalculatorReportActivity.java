@@ -83,7 +83,7 @@ public class DistanceCalculatorReportActivity extends Activity {
         if (hasFocus && saveWhenRendered) {
             saveWhenRendered = false;
             View v = findViewById(R.id.reportTitleText).getRootView();
-            DistanceCalculatorUtilities.saveParentView(v, this);
+            DistanceCalculatorUtilities.saveParentView(v, this, false);
         }
     }
 
@@ -96,8 +96,15 @@ public class DistanceCalculatorReportActivity extends Activity {
             Log.i("activity", "Help selected");
             Intent helpIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://distancecalculator.gebogebo.com/help"));
             startActivity(helpIntent);
+        } else if(item.getItemId() == R.id.share) {
+            Log.i("menu", "Share with selected");
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("image/png");
+            String tmpFilename = DistanceCalculatorUtilities.saveParentView(findViewById(R.id.reportTitleText).getRootView(), this, true);
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + tmpFilename));
+            startActivity(Intent.createChooser(intent, getString(R.string.share)));
         } else if (item.getItemId() == R.id.menu_capture) {
-            DistanceCalculatorUtilities.saveParentView(findViewById(R.id.reportTitleText).getRootView(), this);
+            DistanceCalculatorUtilities.saveParentView(findViewById(R.id.reportTitleText).getRootView(), this, false);
             Log.i("activity", "successfully captured screenshot");
         }
         return true;

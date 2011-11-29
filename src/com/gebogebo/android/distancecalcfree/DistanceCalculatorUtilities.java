@@ -19,6 +19,7 @@ public class DistanceCalculatorUtilities {
     public static final String ADMOB_KEY = "a14d09d21af1d1f";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MMM.dd_HH.mm.ss");
     private static final String SCREENSHOT_DIR = "distancecalc";
+    private static final String SCREENSHOT_TEMP_DIR = "distancecalcTmp";
 
     /**
      * converts given float distance and returns string representation which is directly displayable on activity
@@ -119,38 +120,70 @@ public class DistanceCalculatorUtilities {
      * 
      * @param v view whose screenshot is to be taken
      * @param c context from which view is selected
+     * @param isTemporary indicates if parent view of given view is to be saved temporarily or not 
      */
-    public static void saveParentView(View v, Context c) {
+    public static String saveParentView(View v, Context c, boolean isTemporary) {
         v.setDrawingCacheEnabled(true);
         Bitmap bitmap = v.getDrawingCache();
         try {
-            if (!Environment.MEDIA_MOUNTED.equalsIgnoreCase(Environment.getExternalStorageState())) {
+            if(!Environment.MEDIA_MOUNTED.equalsIgnoreCase(Environment.getExternalStorageState())) {
                 Log.i("activity", "external storage not mounted");
                 Toast.makeText(c, R.string.msg_no_storage, Toast.LENGTH_LONG).show();
-                // inform user that external storage device is not mounted
-                return;
+                //inform user that external storage device is not mounted
+                return null;
             }
-            File dirPath = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator
-                    + SCREENSHOT_DIR + File.separator);
-            if (!dirPath.exists()) {
-                if (!dirPath.mkdir()) {
-                    // let user know about error
+            File dirPath = null;
+            if(isTemporary) {
+                dirPath = new File(getTempDirPath());
+            } else {
+                dirPath = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + SCREENSHOT_DIR
+                        + File.separator);
+            }
+            if(dirPath != null && !dirPath.exists()) {
+                if(!dirPath.mkdir()) {
+                    //let user know about error
                     Log.i("activity", "unable to create directory");
-                    return;
+                    return null;
                 }
             }
             Date now = new Date();
-            String filename = dirPath + File.separator + DATE_FORMAT.format(now) + ".png";
-            Log.i("activity", "external storage dir: " + filename);
+            String filename = dirPath.getAbsolutePath() + File.separator + DATE_FORMAT.format(now) + ".png";
             File newFile = new File(filename);
             FileOutputStream outStream = new FileOutputStream(newFile);
             bitmap.compress(CompressFormat.PNG, 90, outStream);
-            Log.i("activity", "screenshot captured");
-            Toast.makeText(c, String.format(c.getString(R.string.msg_file_saved), filename), Toast.LENGTH_LONG).show();
-        } catch (Exception e) {
-            Log.e("activity", "unable to capture screenshot: " + e);
+            Log.i("util", "screenshot captured to file: " + filename);
+            return filename;
+        } catch(Exception e) {
+            Log.e("util", "exception while capturing screenshot: " + e, e);
             Toast.makeText(c, R.string.msg_unable_to_save, Toast.LENGTH_LONG).show();
         }
+        return null;
+    }
+    
+    /**
+     * deletes all temporary file from distance calculator temporary directory
+     */
+    public static void deleteTempFiles() {
+        File dirPath = new File(getTempDirPath());
+        try {
+            for(File file : dirPath.listFiles()) {
+                file.delete();
+            }
+            Log.i("util", "deleted all temp files successfully");
+        } catch(Throwable t) {
+            Log.i("util", "error while deleting temp file. continuing with others");
+        }
+    }
+    
+    /**
+     * obtains string to get the temporary directory for distance calculator app
+     * 
+     * @return string representing temporary directory for distance calculator app
+     */
+    private static String getTempDirPath() {
+        String tmpDirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + SCREENSHOT_DIR
+            + File.separator + SCREENSHOT_TEMP_DIR + File.separator;
+        return tmpDirPath;
     }
 
     /**
@@ -177,16 +210,16 @@ public class DistanceCalculatorUtilities {
      */
     public int getErrorTextId(int errorCode) {
         if (LocationProvider.OUT_OF_SERVICE == errorCode) {
-            Log.d("locationService", "GPS service not available");
+            Log.d("util", "GPS service not available");
             return R.string.service_not_available;
         } else if (LocationProvider.TEMPORARILY_UNAVAILABLE == errorCode) {
-            Log.d("locationService", "GPS service temporariliy not available");
+            Log.d("util", "GPS service temporariliy not available");
             return R.string.service_temp_not_available;
         } else if (LocationProvider.AVAILABLE == errorCode) {
-            Log.d("locationService", "Service is back and running");
+            Log.d("util", "Service is back and running");
             return R.string.empty;
         } else {
-            Log.w("locationService", "Unknow errorCode sent to activity by distance service. Code:  " + errorCode);
+            Log.w("util", "Unknow errorCode sent to activity by distance service. Code:  " + errorCode);
             return -1;
         }
     }
