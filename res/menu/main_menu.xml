@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
     <item android:id="@+id/settings" android:icon="@drawable/settings" android:titleCondensed="@string/settings" android:title="@string/settings"></item>
-    
+    <item android:id="@+id/share" android:icon="@drawable/share" android:titleCondensed="@string/share" android:title="@string/share"></item>
     <item android:id="@+id/menu_help" android:icon="@drawable/help" android:titleCondensed="@string/help" android:title="@string/help"></item>
     <item android:id="@+id/menu_capture" android:icon="@drawable/camera" android:titleCondensed="@string/capture" android:title="@string/capture"></item>
     <item android:id="@+id/menu_report" android:icon="@drawable/report" android:titleCondensed="@string/report" android:title="@string/report"></item>
     <item android:id="@+id/menu_exit" android:title="@string/exit" android:icon="@drawable/exit"></item>
-    
-    
+
 </menu>

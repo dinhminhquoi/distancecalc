@@ -82,4 +82,5 @@
 <string name="yes">Yes</string>
 <string name="no">No</string>
 <string name="enableGpsDialogMsg">GPS is not enabled. Do you want to enable it now?</string>
+<string name="share">Share</string>
 </resources>
