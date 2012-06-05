@@ -1,9 +1,5 @@
 package com.gebogebo.android.distancecalcfree;
 
-import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
-import com.google.ads.AdView;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -26,7 +22,6 @@ public class DistanceCalculatorReportActivity extends Activity {
     public static final String INTENT_PARAM_AUTO_REPORT = "com.gebogebo.distancecalc.report";
     
     private boolean saveWhenRendered = false;
-    private AdView adView = null; 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,11 +42,13 @@ public class DistanceCalculatorReportActivity extends Activity {
         
         setContentView(R.layout.report);
         
-        // AdManager.setTestDevices( new String[] { AdManager.TEST_EMULATOR,
-        // "CA101E12F9C3DF4E8301247EF68FB13C" } );
-        adView = new AdView(this, AdSize.BANNER, DistanceCalculatorUtilities.ADMOB_KEY);
-        adView.loadAd(new AdRequest());
-        ((LinearLayout)findViewById(R.id.reportLayout)).addView(adView);
+        LinearLayout layout = ((LinearLayout)findViewById(R.id.reportLayout));
+        //50% probability
+        if(DistanceCalculatorUtilities.getRandomInt(2) == 1) {
+            DistanceCalculatorUtilities.addAdmobAd(this, layout);
+        } else {
+            DistanceCalculatorUtilities.addMilleniaAd(this, layout);
+        }
         
         TextView view = (TextView) findViewById(R.id.totalDistanceCovered);
         view.setText(report.getTotalDistanceString());

@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.gebogebo.android.distancecalcfree"
-      android:versionCode="8"
-      android:versionName="1.8" >
+      android:versionCode="9"
+      android:versionName="2.0" >
     <application android:icon="@drawable/ruler_launcher" android:label="@string/app_name">
 		<!-- AD MOB: START -->
 		<activity android:name="com.google.ads.AdActivity"
 		    android:configChanges="keyboard|keyboardHidden|orientation"/>
 		<!-- AD MOB: END -->
-    
+		
+        <!-- millenia ads: start -->
+        <activity android:name="com.millennialmedia.android.MMAdViewOverlayActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:configChanges="keyboardHidden|orientation|keyboard" />
+            
+        <activity android:name="com.millennialmedia.android.VideoPlayer"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:configChanges="keyboardHidden|orientation|keyboard" />
+        <!-- millenia ads: end -->
+		
         <activity android:label="@string/app_name" android:name="DistanceCalculatorActivity"
                   android:screenOrientation="portrait" android:launchMode="singleTask">
             <intent-filter>

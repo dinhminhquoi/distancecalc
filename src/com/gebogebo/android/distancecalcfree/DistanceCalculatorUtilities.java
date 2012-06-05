@@ -1,10 +1,19 @@
 package com.gebogebo.android.distancecalcfree;
 
+import static java.lang.String.format;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 
+import com.google.ads.AdRequest;
+import com.google.ads.AdSize;
+import com.google.ads.AdView;
+import com.millennialmedia.android.MMAdView;
+
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -13,13 +22,16 @@ import android.os.Environment;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class DistanceCalculatorUtilities {
     public static final String ADMOB_KEY = "a14d09d21af1d1f";
+    private static final String MILLENIA_KEY = "61922";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MMM.dd_HH.mm.ss");
     private static final String SCREENSHOT_DIR = "distancecalc";
     private static final String SCREENSHOT_TEMP_DIR = "distancecalcTmp";
+    private static Random random = new Random(System.currentTimeMillis());
 
     /**
      * converts given float distance and returns string representation which is directly displayable on activity
@@ -222,5 +234,32 @@ public class DistanceCalculatorUtilities {
             Log.w("util", "Unknow errorCode sent to activity by distance service. Code:  " + errorCode);
             return -1;
         }
+    }
+    
+    /**
+     * adds millenia ad to given layout, with given adType and with given refresh time.
+     * (refresh time isn't working as of now)
+     * 
+     * @param ll layout in which millenia ad is to be added
+     */
+    public static void addMilleniaAd(Activity activity, LinearLayout ll) {
+        Log.i("activity", format("adding millenia %s type ad", MMAdView.BANNER_AD_BOTTOM));
+        MMAdView mmAdView = new MMAdView(activity, MILLENIA_KEY, MMAdView.BANNER_AD_BOTTOM, 60);
+        mmAdView.setId(random.nextInt(Integer.MAX_VALUE));
+        ll.addView(mmAdView);
+        mmAdView.fetch();
+    }
+    
+    public static AdView addAdmobAd(Activity activity, LinearLayout ll) {
+        // AdManager.setTestDevices( new String[] { AdManager.TEST_EMULATOR,
+        // "CA101E12F9C3DF4E8301247EF68FB13C" } );
+        AdView adView = new AdView(activity, AdSize.BANNER, DistanceCalculatorUtilities.ADMOB_KEY);
+        adView.loadAd(new AdRequest());
+        ll.addView(adView);
+        return adView;
+    }
+    
+    public static int getRandomInt(int upperLimit) {
+        return random.nextInt(upperLimit);
     }
 }

@@ -3,7 +3,6 @@ package com.gebogebo.android.distancecalcfree;
 import static java.lang.String.format;
 
 import java.text.SimpleDateFormat;
-import java.util.Random;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -31,7 +30,6 @@ import android.widget.Toast;
 
 import com.gebogebo.android.distancecalcfree.DistanceCalculatorService.DistanceServiceBinder;
 import com.google.ads.AdRequest;
-import com.google.ads.AdSize;
 import com.google.ads.AdView;
 
 /**
@@ -39,6 +37,7 @@ import com.google.ads.AdView;
  * 
  */
 public class DistanceCalculatorActivity extends Activity implements OnClickListener, DistanceCalculatorServiceListener {
+    private static final String lg = "activity";
     private static final String DATE_FORMAT_NOW = "dd-MMM-yyyy HH:mm";
     private static final int GPS_NOT_ENABLED_START = 100;
     private static final int GPS_NOT_ENABLED_RESUME = 101;
@@ -62,7 +61,6 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
 
     private float multiplier = 1.0F;
     private String distanceSuffix;
-    private Random random = new Random(System.currentTimeMillis());
     private AdView adView = null;
 
     /**
@@ -90,14 +88,14 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
                 errorText.setText(R.string.service_temp_not_available);
             }
             util = new DistanceCalculatorUtilities();
-            Log.i("activity", "handled on click event for button. calculating distance now.");
+            Log.i(lg, "handled on click event for button. calculating distance now.");
         } else {
             // if app was brought to non distance calculating mode
             button.setText(R.string.start);
             Button pauseButton = (Button) findViewById(R.drawable.pause);
             pauseButton.setText(R.string.pause);
             errorText.setText(R.string.empty);
-            Log.i("activity", "handled on click event for button. not calculating distance now.");
+            Log.i(lg, "handled on click event for button. not calculating distance now.");
         }
         SharedPreferences defPref = PreferenceManager.getDefaultSharedPreferences(this);
         String action = defPref.getString(DistanceCalculatorPrefActivity.PREF_KEY_ACTION,
@@ -114,7 +112,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         // default selection is miles
         String selectedMetricId = defPref.getString(DistanceCalculatorPrefActivity.PREF_KEY_DISTANCE_UNIT,
                 DistanceCalculatorPrefActivity.PREF_MILES);
-        Log.i("activity", "got selected metric: " + selectedMetricId);
+        Log.i(lg, "got selected metric: " + selectedMetricId);
         multiplier = DistanceCalculatorPrefActivity.getDistanceMultiplierForDistanceUnit(selectedMetricId);
         if (DistanceCalculatorPrefActivity.PREF_KM.equals(selectedMetricId)) {
             distanceSuffix = getString(R.string.km);
@@ -161,7 +159,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         }
         timeText.setText(DistanceCalculatorUtilities.getVisualTime(totalTimeInSecs, timeElapsedStr));
 
-        if (random.nextInt(10) < 3 && adView != null) {
+        if (DistanceCalculatorUtilities.getRandomInt(10) < 3 && adView != null) {
             // with a probability of 30%
             adView.loadAd(new AdRequest());
         }
@@ -169,7 +167,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
 
     @Override
     public void onServiceStatusChange(int statusCode) {
-        Log.i("activity", "status changed. statusCode: " + statusCode);
+        Log.i(lg, "status changed. statusCode: " + statusCode);
         if(statusCode == LocationProvider.TEMPORARILY_UNAVAILABLE && isCalculatingDistance) {
            showDialog(GPS_SWITCHED_OFF);
         }
@@ -185,7 +183,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         DistanceCalculatorUtilities.deleteTempFiles();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        Log.i("activity", "set activity as content view: " + this);
+        Log.i(lg, "set activity as content view: " + this);
         
         util = new DistanceCalculatorUtilities();
         distanceText = (TextView) findViewById(R.drawable.distance);
@@ -199,7 +197,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         Button pauseButton = (Button) findViewById(R.drawable.pause);
         button.setOnClickListener(this);
         pauseButton.setOnClickListener(this);
-        Log.i("activity", "added button click listener");
+        Log.i(lg, "added button click listener");
 
         setDistanceParameters();
 
@@ -209,11 +207,13 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         startService(serviceStart);
         bindService(serviceStart, serviceConn, BIND_AUTO_CREATE);
 
-        // AdManager.setTestDevices( new String[] { AdManager.TEST_EMULATOR,
-        // "CA101E12F9C3DF4E8301247EF68FB13C" } );
-        adView = new AdView(this, AdSize.BANNER, DistanceCalculatorUtilities.ADMOB_KEY);
-        adView.loadAd(new AdRequest());
-        ((LinearLayout)findViewById(R.id.mainLayout)).addView(adView);
+        LinearLayout layout = ((LinearLayout)findViewById(R.id.mainLayout));
+        //50% probability
+        if(DistanceCalculatorUtilities.getRandomInt(2) == 1) {
+            adView = DistanceCalculatorUtilities.addAdmobAd(this, layout);
+        } else {
+            DistanceCalculatorUtilities.addMilleniaAd(this, layout);
+        }
     }
 
     @Override
@@ -226,23 +226,23 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_exit) {
-            Log.i("activity", "Exit selected");
+            Log.i(lg, "Exit selected");
             DistanceCalculatorUtilities.deleteTempFiles();
             this.finish();
         } else if (item.getItemId() == R.id.settings) {
-            Log.i("activity", "Settings selected");
+            Log.i(lg, "Settings selected");
             Intent prefIntent = new Intent(Intent.ACTION_EDIT);
             prefIntent.addCategory(Intent.CATEGORY_PREFERENCE);
-            startActivityForResult(prefIntent, 1);
+            startActivityForResult(prefIntent, DISTANCE_CALC_PREF_CHANGE);
         } else if(item.getItemId() == R.id.share) {
-            Log.i("menu", "Share with selected");
+            Log.i(lg, "Share with selected");
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("image/png");
             String tmpFilename =  DistanceCalculatorUtilities.saveParentView(distanceText.getRootView(), this, true);
             intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + tmpFilename));
             startActivity(Intent.createChooser(intent, getString(R.string.share)));
         } else if (item.getItemId() == R.id.menu_help) {
-            Log.i("activity", "Help selected");
+            Log.i(lg, "Help selected");
             Intent helpIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://distancecalculator.gebogebo.com/help"));
             startActivity(helpIntent);
         } else if (item.getItemId() == R.id.menu_capture) {
@@ -250,7 +250,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
             if(filename != null) {
                 Toast.makeText(this, String.format(this.getString(R.string.msg_file_saved), filename), Toast.LENGTH_LONG).show();
             }
-            Log.i("activity", "successfully captured screenshot");
+            Log.i(lg, "successfully captured screenshot");
         } else if (item.getItemId() == R.id.menu_report) {
             DistanceCalcReport report = getSummaryReport();
             startReportActivity(report, false);
@@ -279,27 +279,30 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
 
     @Override
     public void onBackPressed() {
-        Log.i("activity", "BACK button pressed");
+        Log.i(lg, "BACK button pressed");
         moveTaskToBack(false);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i("activity", format("received activity result. request %s, result %s, isPaused %s, isCalculating %s", requestCode, resultCode,
+        Log.i(lg, format("received activity result. request %s, result %s, isPaused %s, isCalculating %s", requestCode, resultCode,
                 isPaused, isCalculatingDistance));
         super.onActivityResult(requestCode, resultCode, data);
         switch(requestCode) {
             case GPS_ENABLE_ACTIVITY_RESUME:
+                Log.i(lg, "GPS enable activity resume clicked");
                 handleButtonClick(R.drawable.pause);
                 break;
             case GPS_ENABLE_ACTIVITY_START:
+                Log.i(lg, "GPS enable activity start clicked");
                 handleButtonClick(R.drawable.button);
                 break;
             case DISTANCE_CALC_PREF_CHANGE:
+                Log.i(lg, "return from preferences");
                 setDistanceParameters();
                 break;
             default:
-                Log.i("activity", format("nothing to do. req %s, result %s", requestCode, resultCode));
+                Log.i(lg, format("nothing to do. req %s, result %s", requestCode, resultCode));
         }
     }
     
@@ -324,7 +327,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
                     locationService.start();
                     locationService.addListener(this);
                 } catch(IllegalStateException e) {
-                    Log.i("activity", "gps is not enabled. app can't be started");
+                    Log.i(lg, "gps is not enabled. app can't be started");
                     isCalculatingDistance = !isCalculatingDistance;
                     showDialog(GPS_NOT_ENABLED_START);
                 }
@@ -332,7 +335,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
                 //when STOP is clicked
                 SharedPreferences defPref = PreferenceManager.getDefaultSharedPreferences(this);
                 boolean autoReport = defPref.getBoolean(DistanceCalculatorPrefActivity.PREF_KEY_AUTO_REPORT, false);
-                Log.i("activity", "auto report is: " + autoReport);
+                Log.i(lg, "auto report is: " + autoReport);
                 
                 boolean autoSave = false;
                 DistanceCalcReport report = null;
@@ -340,7 +343,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
                     autoSave = defPref.getBoolean(DistanceCalculatorPrefActivity.PREF_KEY_AUTO_SAVE, false);
                     report = getSummaryReport();
                 }
-                Log.i("activity", "auto save is: " + autoSave);
+                Log.i(lg, "auto save is: " + autoSave);
                 
                 locationService.removeListener(this);
                 locationService.stop();
@@ -363,7 +366,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
                     pauseButton.setText(R.string.pause);
                     errorText.setText(R.string.service_temp_not_available);
                 } catch(IllegalStateException e) {
-                    Log.i("activity", "gps is not enabled. app can't be started");
+                    Log.i(lg, "gps is not enabled. app can't be started");
                     isPaused = !isPaused;
                     showDialog(GPS_NOT_ENABLED_RESUME);
                 }
@@ -387,12 +390,12 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
         reportIntent.putExtra(DistanceCalculatorReportActivity.INTENT_PARAM_AUTO_REPORT, report);
         reportIntent.putExtra(DistanceCalculatorReportActivity.INTENT_PARAM_AUTO_SAVE, saveWhenRendered);
         startActivity(reportIntent);
-        Log.i("activity", "Generate report selected");
+        Log.i(lg, "Generate report selected");
     }
     
     @Override
     protected Dialog onCreateDialog(int id) {
-        Log.i("activity", format("creating dialog. id %s, isPaused %s, isCalculating %s", id, isPaused, isCalculatingDistance));
+        Log.i(lg, format("creating dialog. id %s, isPaused %s, isCalculating %s", id, isPaused, isCalculatingDistance));
         Dialog dialog = null;
         switch (id) {
             case GPS_NOT_ENABLED_START:
@@ -417,7 +420,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
      * @return generated dialog box
      */
     private Dialog generateGpsDisabledAlert(final int requestCode) {
-        Log.i("activity", "generating error box to enable GPS");
+        Log.i(lg, "generating error box to enable GPS");
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
         alertBuilder.setCancelable(true)
             .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
@@ -433,7 +436,7 @@ public class DistanceCalculatorActivity extends Activity implements OnClickListe
                 }
             })
             .setMessage(getString(R.string.enableGpsDialogMsg));
-        Log.i("activity", "gps disabled dialog created");
+        Log.i(lg, "gps disabled dialog created");
         return alertBuilder.create();
     }
 
