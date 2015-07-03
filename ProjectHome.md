@@ -1,0 +1,1 @@
+Calculates distance between two locations for GPS enabled android devices
